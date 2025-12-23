@@ -11,6 +11,7 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Home, Receipt, HandCoins, LogOut } from "lucide-react";
+const logo = "/images/logo-nav.png";
 
 function NavBar() {
   const pathname = usePathname();
@@ -38,12 +39,11 @@ function NavBar() {
       <div className="container flex h-16 items-center justify-between px-4">
         {/* Logo/Brand */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            NeKiPay
-          </div>
-          <div className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground">
-            👭
-          </div>
+          <img
+            src={logo}
+            alt="NeKiPay logo"
+            className="h-10 md:h-12 w-auto object-contain"
+          />
         </Link>
 
         {/* Navigation Tabs */}
@@ -68,10 +68,10 @@ function NavBar() {
         </nav>
 
         {/* Logout (optional - you can remove if not needed) */}
-        <Button variant="ghost" size="sm" className="gap-2">
+        {/* <Button variant="ghost" size="sm" className="gap-2">
           <LogOut className="h-4 w-4" />
           <span className="hidden sm:inline">Logout</span>
-        </Button>
+        </Button> */}
       </div>
     </header>
   );

@@ -17,7 +17,8 @@ import { serializeDoc } from "@/lib/firestore-helpers";
  */
 export async function POST(request, { params }) {
   try {
-    const { id } = params;
+    // Await params in Next.js 15+
+    const { id } = await params;
     const body = await request.json();
     const { confirmedBy, pin, paymentMethod } = body;
 

@@ -13,8 +13,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "NeKiPay - Neki & Kiruthika's Pocket Tracker",
-  description: "Track expenses and settlements between Neki and Kiruthika",
+  title: "NeKiPay - Neha & Kiruthika's Pocket Tracker",
+  description: "Track expenses and settlements between Neha and Kiruthika",
+  icons: {
+    icon: "/images/logo-rounded.png",
+  },
 };
 
 export default function RootLayout({ children }) {

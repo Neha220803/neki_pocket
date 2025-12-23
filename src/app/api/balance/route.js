@@ -12,6 +12,7 @@ import {
   getIndividualSummary,
   getSettlementRecommendation,
 } from "@/services/balance.service";
+import { serializeDocs } from "@/lib/firestore-helpers";
 
 /**
  * Get current balance calculation

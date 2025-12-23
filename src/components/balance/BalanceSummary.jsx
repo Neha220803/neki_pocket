@@ -44,7 +44,7 @@ function BalanceSummary({ balance, individual, className }) {
           )}
           {isSettled && (
             <div className="text-2xl font-semibold text-accent-foreground">
-              All settled up! 🎉
+              No outstanding balance
             </div>
           )}
         </CardContent>

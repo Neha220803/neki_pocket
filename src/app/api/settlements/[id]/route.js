@@ -17,7 +17,8 @@ import { serializeDoc } from "@/lib/firestore-helpers";
  */
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    // Await params in Next.js 15+
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(

@@ -3,7 +3,6 @@
 // ============================================
 // Operations for managing settlements between Kiruthika and Neha
 
-// import { Timestamp } from "firebase/firestore";
 import { Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/firebase/firebaseAdmin";
 import { COLLECTIONS, SETTLEMENT_STATUS, PEOPLE } from "@/lib/constants";

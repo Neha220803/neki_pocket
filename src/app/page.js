@@ -149,7 +149,7 @@ export default function DashboardPage() {
             </Button>
           </Link>
         </CardHeader>
-        <CardContent>
+        <CardContent className={"px-2 md:px-6"}>
           <ExpenseList
             expenses={recentExpenses}
             loading={loading}

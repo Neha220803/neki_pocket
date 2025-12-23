@@ -1,10 +1,20 @@
+// ============================================
+// API ROUTE: Single Expense Operations
+// GET /api/expenses/[id] - Get expense by ID
+// DELETE /api/expenses/[id] - Delete expense
+// ============================================
+
 import { NextResponse } from "next/server";
 import { getExpenseById, deleteExpense } from "@/services/expenses.service";
-import { serializeDoc } from "@/lib/firestore-helpers"; // ← Add this
+import { serializeDoc } from "@/lib/firestore-helpers";
 
+/**
+ * GET single expense by ID
+ */
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    // Await params in Next.js 15+
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(
@@ -17,7 +27,7 @@ export async function GET(request, { params }) {
 
     return NextResponse.json({
       success: true,
-      expense: serializeDoc(expense), // ← Serialize here
+      expense: serializeDoc(expense),
     });
   } catch (error) {
     console.error("Error fetching expense:", error);
@@ -36,9 +46,13 @@ export async function GET(request, { params }) {
   }
 }
 
+/**
+ * DELETE expense by ID
+ */
 export async function DELETE(request, { params }) {
   try {
-    const { id } = params;
+    // Await params in Next.js 15+
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(
@@ -52,7 +66,7 @@ export async function DELETE(request, { params }) {
     return NextResponse.json({
       success: true,
       message: result.message,
-      deletedExpense: serializeDoc(result.deletedExpense), // ← Serialize here
+      deletedExpense: serializeDoc(result.deletedExpense),
     });
   } catch (error) {
     console.error("Error deleting expense:", error);
