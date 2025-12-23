@@ -14,6 +14,7 @@ import {
   getRecentSettlements,
   getSettlementsByPerson,
 } from "@/services/settlements.service";
+import { serializeDocs, serializeDoc } from "@/lib/firestore-helpers";
 
 /**
  * GET all settlements with optional filters
@@ -44,9 +45,9 @@ export async function GET(request) {
       const settlements = await getSettlementsByPerson(person);
       return NextResponse.json({
         success: true,
-        settlements: settlements.all,
-        sent: settlements.sent,
-        received: settlements.received,
+        settlements: serializeDocs(settlements.all),
+        sent: serializeDocs(settlements.sent),
+        received: serializeDocs(settlements.received),
         person,
       });
     }
@@ -57,7 +58,7 @@ export async function GET(request) {
       const settlements = await getRecentSettlements(count);
       return NextResponse.json({
         success: true,
-        settlements,
+        settlements: serializeDocs(settlements),
         count: settlements.length,
       });
     }
@@ -67,7 +68,7 @@ export async function GET(request) {
       const settlements = await getPendingSettlements();
       return NextResponse.json({
         success: true,
-        settlements,
+        settlements: serializeDocs(settlements),
         count: settlements.length,
         status: "pending",
       });
@@ -77,7 +78,7 @@ export async function GET(request) {
       const settlements = await getConfirmedSettlements();
       return NextResponse.json({
         success: true,
-        settlements,
+        settlements: serializeDocs(settlements),
         count: settlements.length,
         status: "confirmed",
       });
@@ -96,9 +97,9 @@ export async function GET(request) {
 
     return NextResponse.json({
       success: true,
-      settlements,
-      pending,
-      confirmed,
+      settlements: serializeDocs(settlements),
+      pending: serializeDocs(pending),
+      confirmed: serializeDocs(confirmed),
       count: settlements.length,
     });
   } catch (error) {
@@ -142,7 +143,7 @@ export async function POST(request) {
       {
         success: true,
         message: "Settlement created successfully",
-        settlement,
+        settlement: serializeDoc(settlement),
       },
       { status: 201 }
     );

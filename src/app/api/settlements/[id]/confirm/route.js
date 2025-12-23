@@ -9,6 +9,7 @@ import {
   getSettlementById,
 } from "@/services/settlements.service";
 import { verifyPIN } from "@/lib/validators";
+import { serializeDoc } from "@/lib/firestore-helpers";
 
 /**
  * POST - Confirm settlement by a person
@@ -79,7 +80,7 @@ export async function POST(request, { params }) {
       message: isFullyConfirmed
         ? "Settlement fully confirmed by both parties! 🎉"
         : `Settlement confirmed by ${confirmedBy}. Waiting for other party.`,
-      settlement: updatedSettlement,
+      settlement: serializeDoc(updatedSettlement),
       isFullyConfirmed,
     });
   } catch (error) {

@@ -10,6 +10,7 @@ import {
   deleteSettlement,
   getConfirmationStatus,
 } from "@/services/settlements.service";
+import { serializeDoc } from "@/lib/firestore-helpers";
 
 /**
  * GET single settlement by ID
@@ -30,7 +31,7 @@ export async function GET(request, { params }) {
 
     return NextResponse.json({
       success: true,
-      settlement,
+      settlement: serializeDoc(settlement),
       confirmationStatus,
     });
   } catch (error) {
@@ -72,7 +73,7 @@ export async function DELETE(request, { params }) {
     return NextResponse.json({
       success: true,
       message: result.message,
-      deletedSettlement: result.deletedSettlement,
+      deletedSettlement: serializeDoc(result.deletedSettlement),
     });
   } catch (error) {
     console.error("Error deleting settlement:", error);

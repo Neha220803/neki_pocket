@@ -14,8 +14,9 @@ import {
   orderBy,
   limit,
   where,
-  Timestamp,
+  // Timestamp,
 } from "firebase/firestore";
+import { Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/firebase/firebaseAdmin";
 import { COLLECTIONS } from "@/lib/constants";
 import { validateExpense } from "@/lib/validators";

@@ -12,6 +12,7 @@ import {
   getRecentExpenses,
   getExpensesByPerson,
 } from "@/services/expenses.service";
+import { serializeDocs, serializeDoc } from "@/lib/firestore-helpers";
 
 /**
  * GET all expenses with optional filters
@@ -42,7 +43,7 @@ export async function GET(request) {
       const expenses = await getRecentExpenses(count);
       return NextResponse.json({
         success: true,
-        expenses,
+        expenses: serializeDocs(expenses),
         count: expenses.length,
       });
     }
@@ -52,7 +53,7 @@ export async function GET(request) {
       const expenses = await getExpensesByPerson(paidBy);
       return NextResponse.json({
         success: true,
-        expenses,
+        expenses: serializeDocs(expenses),
         count: expenses.length,
         paidBy,
       });
@@ -66,7 +67,7 @@ export async function GET(request) {
 
     return NextResponse.json({
       success: true,
-      expenses,
+      expenses: serializeDocs(expenses),
       count: expenses.length,
     });
   } catch (error) {
@@ -109,7 +110,7 @@ export async function POST(request) {
       {
         success: true,
         message: "Expense created successfully",
-        expense,
+        expense: serializeDoc(expense),
       },
       { status: 201 }
     );

@@ -1,15 +1,7 @@
-// ============================================
-// API ROUTE: Single Expense Operations
-// GET /api/expenses/[id] - Get expense by ID
-// DELETE /api/expenses/[id] - Delete expense
-// ============================================
-
 import { NextResponse } from "next/server";
 import { getExpenseById, deleteExpense } from "@/services/expenses.service";
+import { serializeDoc } from "@/lib/firestore-helpers"; // ← Add this
 
-/**
- * GET single expense by ID
- */
 export async function GET(request, { params }) {
   try {
     const { id } = params;
@@ -25,7 +17,7 @@ export async function GET(request, { params }) {
 
     return NextResponse.json({
       success: true,
-      expense,
+      expense: serializeDoc(expense), // ← Serialize here
     });
   } catch (error) {
     console.error("Error fetching expense:", error);
@@ -44,9 +36,6 @@ export async function GET(request, { params }) {
   }
 }
 
-/**
- * DELETE expense by ID
- */
 export async function DELETE(request, { params }) {
   try {
     const { id } = params;
@@ -63,7 +52,7 @@ export async function DELETE(request, { params }) {
     return NextResponse.json({
       success: true,
       message: result.message,
-      deletedExpense: result.deletedExpense,
+      deletedExpense: serializeDoc(result.deletedExpense), // ← Serialize here
     });
   } catch (error) {
     console.error("Error deleting expense:", error);
