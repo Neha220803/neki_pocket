@@ -89,12 +89,12 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { paidBy, amount, reason } = body;
+    const { paidBy, paidFor, amount, reason } = body;
 
     // Validate required fields
-    if (!paidBy || !amount || !reason) {
+    if (!paidBy || !paidFor || !amount || !reason) {
       return NextResponse.json(
-        { error: "Missing required fields: paidBy, amount, reason" },
+        { error: "Missing required fields: paidBy, paidFor, amount, reason" },
         { status: 400 }
       );
     }
@@ -102,6 +102,7 @@ export async function POST(request) {
     // Create expense
     const expense = await createExpense({
       paidBy,
+      paidFor: paidFor || "Both", // Default to "Both" if not provided
       amount: Number(amount),
       reason: reason.trim(),
     });

@@ -15,34 +15,51 @@ export function calculateBalance(expenses = [], settlements = []) {
   // Initialize totals
   let kiruthikaPaid = 0;
   let nehaPaid = 0;
-
-  // Sum up expenses by person
-  expenses.forEach((expense) => {
-    const amount = Number(expense.amount);
-    if (expense.paidBy === PEOPLE.KIRUTHIKA) {
-      kiruthikaPaid += amount;
-    } else if (expense.paidBy === PEOPLE.NEHA) {
-      nehaPaid += amount;
-    }
-  });
-
-  // Calculate total expenses
-  const totalExpenses = kiruthikaPaid + nehaPaid;
-
-  // Each person's fair share (50-50 split)
-  const fairShare = totalExpenses / 2;
-
-  // Calculate who owes whom BEFORE settlements
   let kiruthikaOwesNeha = 0;
   let nehaOwesKiruthika = 0;
 
-  if (kiruthikaPaid > nehaPaid) {
-    // Kiruthika paid more, so Neha owes her
-    nehaOwesKiruthika = kiruthikaPaid - fairShare;
-  } else if (nehaPaid > kiruthikaPaid) {
-    // Neha paid more, so Kiruthika owes her
-    kiruthikaOwesNeha = nehaPaid - fairShare;
-  }
+  // Process each expense based on paidBy and paidFor
+  expenses.forEach((expense) => {
+    const amount = Number(expense.amount);
+    const paidBy = expense.paidBy;
+    const paidFor = expense.paidFor || "Both"; // Default to "Both" for old expenses
+
+    // Track who paid
+    if (paidBy === PEOPLE.KIRUTHIKA) {
+      kiruthikaPaid += amount;
+    } else if (paidBy === PEOPLE.NEHA) {
+      nehaPaid += amount;
+    }
+
+    // Calculate debt based on paidFor
+    if (paidFor === "Both") {
+      // Split 50-50 (existing behavior)
+      const halfAmount = amount / 2;
+
+      if (paidBy === PEOPLE.KIRUTHIKA) {
+        // Kiruthika paid, Neha owes half
+        nehaOwesKiruthika += halfAmount;
+      } else if (paidBy === PEOPLE.NEHA) {
+        // Neha paid, Kiruthika owes half
+        kiruthikaOwesNeha += halfAmount;
+      }
+    } else if (paidFor === PEOPLE.NEHA) {
+      // Paid for Neha only
+      if (paidBy === PEOPLE.KIRUTHIKA) {
+        // Kiruthika paid for Neha, Neha owes full amount
+        nehaOwesKiruthika += amount;
+      }
+      // If Neha paid for herself, no debt created
+    } else if (paidFor === PEOPLE.KIRUTHIKA) {
+      // Paid for Kiruthika only
+      if (paidBy === PEOPLE.NEHA) {
+        // Neha paid for Kiruthika, Kiruthika owes full amount
+        kiruthikaOwesNeha += amount;
+      }
+      // If Kiruthika paid for herself, no debt created
+    }
+  });
+  const totalExpenses = kiruthikaPaid + nehaPaid;
 
   // Apply confirmed settlements to reduce the balance
   let totalSettled = 0;
@@ -88,6 +105,9 @@ export function calculateBalance(expenses = [], settlements = []) {
 
   // Check if balance exceeds threshold
   const exceedsThreshold = owedAmount >= BALANCE_THRESHOLD;
+
+  // Calculate fair share for display purposes (not used in debt calculation)
+  const fairShare = totalExpenses / 2;
 
   return {
     // Individual totals

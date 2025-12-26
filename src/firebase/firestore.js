@@ -22,7 +22,8 @@ export const getCollection = (collectionName) => {
  * Expense Document Structure
  * @typedef {Object} Expense
  * @property {string} id - Auto-generated document ID
- * @property {string} paidBy - "Kiruthika" | "Neha"
+ * @property {string} paidBy - Who paid the money: "Kiruthika" | "Neha"
+ * @property {string} paidFor - Who benefited: "Both" | "Kiruthika" | "Neha"
  * @property {number} amount - Amount in INR
  * @property {string} reason - Expense description
  * @property {Timestamp} createdAt - Firebase Timestamp

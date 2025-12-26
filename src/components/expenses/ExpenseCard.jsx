@@ -103,11 +103,11 @@ function ExpenseCard({ expense, onDelete, showDelete = true, className }) {
         {/* Desktop/Tablet Layout (>= 640px) - Horizontal */}
         <div className="hidden sm:flex items-start justify-between gap-4">
           {/* Left side - Details */}
-          <div className="flex-1 space-y-1 min-w-0">
+          <div className="flex-1 space-y-1">
             <div className="flex items-center gap-2 flex-wrap">
               <span
                 className={cn(
-                  "text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap",
+                  "text-xs font-medium px-2 py-0.5 rounded-full",
                   expense.paidBy === "Kiruthika"
                     ? "bg-secondary/20 text-secondary-foreground"
                     : "bg-primary/20 text-primary"
@@ -115,14 +115,33 @@ function ExpenseCard({ expense, onDelete, showDelete = true, className }) {
               >
                 {expense.paidBy}
               </span>
-              <span className="text-xs text-muted-foreground whitespace-nowrap">
+              {/* Show "paid for" if not "Both" or if explicitly set */}
+              {expense.paidFor && expense.paidFor !== "Both" && (
+                <>
+                  <span className="text-xs text-muted-foreground">→</span>
+                  <span
+                    className={cn(
+                      "text-xs font-medium px-2 py-0.5 rounded-full border",
+                      expense.paidFor === "Kiruthika"
+                        ? "border-secondary/40 text-secondary-foreground"
+                        : "border-primary/40 text-primary"
+                    )}
+                  >
+                    for {expense.paidFor}
+                  </span>
+                </>
+              )}
+              {(!expense.paidFor || expense.paidFor === "Both") && (
+                <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-full border border-muted">
+                  for Both
+                </span>
+              )}
+              <span className="text-xs text-muted-foreground">
                 {formatDate(expense.createdAt, "relative")}
               </span>
             </div>
 
-            <div className="font-medium text-sm break-words">
-              {expense.reason}
-            </div>
+            <div className="font-medium text-sm">{expense.reason}</div>
           </div>
 
           {/* Right side - Amount and Actions */}

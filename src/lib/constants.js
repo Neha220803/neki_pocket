@@ -8,7 +8,19 @@ export const PEOPLE = {
   NEHA: "Neha",
 };
 
-export const PEOPLE_LIST = [PEOPLE.KIRUTHIKA, PEOPLE.NEHA];
+export const PEOPLE_LIST = ["Kiruthika", "Neha"];
+
+export const PAID_FOR_OPTIONS = {
+  BOTH: "Both",
+  KIRUTHIKA: "Kiruthika",
+  NEHA: "Neha",
+};
+
+export const PAID_FOR_LIST = [
+  PAID_FOR_OPTIONS.BOTH,
+  PAID_FOR_OPTIONS.KIRUTHIKA,
+  PAID_FOR_OPTIONS.NEHA,
+];
 
 // PIN Configuration
 // TODO: In production, store hashed PIN in environment variables

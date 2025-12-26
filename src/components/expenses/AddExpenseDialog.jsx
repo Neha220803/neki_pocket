@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PersonSelect } from "@/components/shared/PersonSelect";
+import { PaidForSelect } from "@/components/shared/PaidForSelect";
 import { ReasonInput } from "@/components/shared/ReasonInput";
 import { Plus, Loader2 } from "lucide-react";
 import { CURRENCY } from "@/lib/constants";
@@ -26,6 +27,7 @@ import { CURRENCY } from "@/lib/constants";
 function AddExpenseDialog({ onExpenseAdded, trigger }) {
   const [open, setOpen] = React.useState(false);
   const [paidBy, setPaidBy] = React.useState("");
+  const [paidFor, setPaidFor] = React.useState("Both");
   const [amount, setAmount] = React.useState("");
   const [reason, setReason] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -35,6 +37,7 @@ function AddExpenseDialog({ onExpenseAdded, trigger }) {
   React.useEffect(() => {
     if (open) {
       setPaidBy("");
+      setPaidFor("Both");
       setAmount("");
       setReason("");
       setError("");
@@ -46,8 +49,13 @@ function AddExpenseDialog({ onExpenseAdded, trigger }) {
     setError("");
 
     // Validation
-    if (!paidBy || !amount || !reason) {
+    if (!paidBy || !paidFor || !amount || !reason) {
       setError("Please fill in all fields");
+      return;
+    }
+
+    if (paidFor !== "Both" && paidBy === paidFor) {
+      setError("Paid By and Paid For cannot be the same person");
       return;
     }
 
@@ -65,6 +73,7 @@ function AddExpenseDialog({ onExpenseAdded, trigger }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           paidBy,
+          paidFor,
           amount: numAmount,
           reason: reason.trim(),
         }),
@@ -114,6 +123,22 @@ function AddExpenseDialog({ onExpenseAdded, trigger }) {
               onValueChange={setPaidBy}
               placeholder="Select who paid"
             />
+          </div>
+
+          {/* Paid For - NEW FIELD */}
+          <div className="space-y-2">
+            <Label htmlFor="paidFor">
+              Paid For <span className="text-destructive">*</span>
+            </Label>
+            <PaidForSelect
+              value={paidFor}
+              onValueChange={setPaidFor}
+              placeholder="Who benefited?"
+            />
+            <p className="text-xs text-muted-foreground">
+              Select "Both" for shared expenses, or choose the individual for
+              personal expenses.
+            </p>
           </div>
 
           {/* Amount */}

@@ -35,6 +35,7 @@ export async function createExpense(expenseData) {
 
   const expense = {
     paidBy: expenseData.paidBy,
+    paidFor: expenseData.paidFor || "Both",
     amount: Number(expenseData.amount),
     reason: expenseData.reason.trim(),
     createdAt: Timestamp.now(),

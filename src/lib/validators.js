@@ -2,7 +2,7 @@
 // INPUT VALIDATORS
 // ============================================
 
-import { VALIDATION, PEOPLE_LIST, APP_PIN } from "./constants";
+import { VALIDATION, PEOPLE_LIST, PAID_FOR_LIST, APP_PIN } from "./constants";
 
 /**
  * Validate expense amount
@@ -46,6 +46,26 @@ export const validatePerson = (person) => {
 
   if (!PEOPLE_LIST.includes(person)) {
     errors.push("Invalid person selected");
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+};
+
+/**
+ * Validate paidFor field
+ */
+export const validatePaidFor = (paidFor) => {
+  const errors = [];
+
+  if (!paidFor) {
+    errors.push("Paid for is required");
+  }
+
+  if (!PAID_FOR_LIST.includes(paidFor)) {
+    errors.push("Invalid paid for option selected");
   }
 
   return {
@@ -132,6 +152,11 @@ export const validateExpense = (expense) => {
   const personValidation = validatePerson(expense.paidBy);
   if (!personValidation.isValid) {
     errors.push(...personValidation.errors);
+  }
+
+  const paidForValidation = validatePaidFor(expense.paidFor);
+  if (!paidForValidation.isValid) {
+    errors.push(...paidForValidation.errors);
   }
 
   const reasonValidation = validateReason(expense.reason);
