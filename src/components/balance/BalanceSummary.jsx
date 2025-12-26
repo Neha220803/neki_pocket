@@ -51,12 +51,11 @@ function BalanceSummary({ balance, individual, className }) {
       </Card>
 
       {/* Individual Payment Summary */}
-      <Card className="bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+      {/* <Card className="bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
         <CardHeader>
           <CardTitle className="text-base">Payment Summary</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {/* Kiruthika's payments */}
           <div className="flex items-center justify-between p-3 bg-background rounded-md">
             <div>
               <div className="font-medium text-sm">Kiruthika Paid</div>
@@ -71,7 +70,6 @@ function BalanceSummary({ balance, individual, className }) {
             />
           </div>
 
-          {/* Neha's payments */}
           <div className="flex items-center justify-between p-3 bg-background rounded-md">
             <div>
               <div className="font-medium text-sm">Neha Paid</div>
@@ -86,7 +84,7 @@ function BalanceSummary({ balance, individual, className }) {
             />
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 }

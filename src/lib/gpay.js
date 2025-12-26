@@ -30,7 +30,7 @@ export function generateGPayLink(to, amount, note = "") {
   });
 
   // UPI deep link format
-  return `upi://pay?${params.toString()}`;
+  return `gpay://upi/pay?${params.toString()}`;
 }
 
 /**
