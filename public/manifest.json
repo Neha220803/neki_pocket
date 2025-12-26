@@ -1,0 +1,64 @@
+{
+  "name": "NeKiPocket - Expense Tracker",
+  "short_name": "NeKiPocket",
+  "description": "Track expenses and settlements between Neha and Kiruthika with beautiful pastel UI",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fcfaf9",
+  "theme_color": "#b794f6",
+  "categories": ["finance", "productivity"],
+  "icons": [
+    {
+      "src": "/images/logo-rounded.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/logo-rounded.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/images/logo-rounded.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/logo-rounded.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Add Expense",
+      "short_name": "Add Expense",
+      "description": "Quickly add a new expense",
+      "url": "/expenses?action=add",
+      "icons": [
+        {
+          "src": "/images/logo-rounded.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "View Balance",
+      "short_name": "Balance",
+      "description": "Check current balance",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/images/logo-rounded.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

@@ -38,7 +38,7 @@ function ExpenseCard({ expense, onDelete, showDelete = true, className }) {
 
   return (
     <Card className={cn(bgColor, "transition-all hover:shadow-md", className)}>
-      <CardContent className="p-3 sm:p-4">
+      <CardContent className="">
         {/* Mobile Layout (< 640px) - Stacked */}
         <div className="flex sm:hidden flex-col gap-2">
           <div className="flex justify-between">
@@ -131,39 +131,39 @@ function ExpenseCard({ expense, onDelete, showDelete = true, className }) {
                   </span>
                 </>
               )}
-              {(!expense.paidFor || expense.paidFor === "Both") && (
-                <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-full border border-muted">
-                  for Both
-                </span>
-              )}
+
               <span className="text-xs text-muted-foreground">
                 {formatDate(expense.createdAt, "relative")}
               </span>
             </div>
 
             <div className="font-medium text-sm">{expense.reason}</div>
+            {(!expense.paidFor || expense.paidFor === "Both") && (
+              <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-full border border-muted">
+                for Both
+              </span>
+            )}
           </div>
 
           {/* Right side - Amount and Actions */}
-          <div className="flex items-center gap-3 shrink-0">
-            <MoneyDisplay
-              amount={expense.amount}
-              size="lg"
-              variant={expense.paidBy === "Kiruthika" ? "secondary" : "primary"}
-              className="font-semibold"
-            />
-
+          <div className="flex flex-col items-end justify-between gap-3 shrink-0">
             {showDelete && (
               <Button
                 variant="ghost"
                 size="icon-sm"
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="text-muted-foreground hover:text-destructive"
+                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
             )}
+            <MoneyDisplay
+              amount={expense.amount}
+              size="lg"
+              variant={expense.paidBy === "Kiruthika" ? "secondary" : "primary"}
+              className="font-semibold"
+            />
           </div>
         </div>
       </CardContent>

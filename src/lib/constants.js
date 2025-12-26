@@ -63,7 +63,7 @@ export const COLLECTIONS = {
 
 // App Metadata
 export const APP_INFO = {
-  NAME: "NeKiPay",
+  NAME: "NeKiPocket",
   TAGLINE: "Neki & Kiruthika's Pocket Tracker",
   VERSION: "1.0.0",
 };

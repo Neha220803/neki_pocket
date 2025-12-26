@@ -68,7 +68,7 @@
   --secondary-foreground: oklch(0.28 0.03 280);
 
   /* UI states */
-  --accent: oklch(0.85 0.08 180);
+  --accent: oklch(0.95 0.06 350);
   /* Mint */
   --accent-foreground: oklch(0.25 0.02 275);
 
@@ -124,7 +124,7 @@
   --secondary: oklch(0.7 0.12 350);
   --secondary-foreground: oklch(0.95 0.01 95);
 
-  --accent: oklch(0.7 0.1 180);
+  --accent: oklch(0.95 0.06 350);
   --accent-foreground: oklch(0.95 0.01 95);
 
   --muted: oklch(0.3 0.02 275);

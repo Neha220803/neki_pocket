@@ -10,7 +10,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Home, Receipt, HandCoins, LogOut } from "lucide-react";
+import { Home, Receipt, HandCoins } from "lucide-react";
 const logo = "/images/logo-nav.png";
 
 function NavBar() {
@@ -35,13 +35,13 @@ function NavBar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4">
         {/* Logo/Brand */}
         <Link href="/" className="flex items-center gap-2">
           <img
             src={logo}
-            alt="NeKiPay logo"
+            alt="NeKiPocket logo"
             className="h-10 md:h-12 w-auto object-contain"
           />
         </Link>

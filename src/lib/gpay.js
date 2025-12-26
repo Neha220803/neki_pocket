@@ -94,6 +94,6 @@ export function isGPaySupported() {
  * @returns {string} UPI deep link
  */
 export function generateSettlementPaymentLink(settlement) {
-  const note = `NeKiPay Settlement - ₹${settlement.amount}`;
+  const note = `NeKi-Pocket Settlement - ₹${settlement.amount}`;
   return generateGPayLink(settlement.to, settlement.amount, note);
 }

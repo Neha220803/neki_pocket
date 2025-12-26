@@ -146,7 +146,7 @@ export default function SettlementsPage() {
     const from = netBalance > 0 ? "Kiruthika" : "Neha";
     const to = netBalance > 0 ? "Neha" : "Kiruthika";
 
-    openGPay(to, owedAmount, `NeKiPay Settlement - ${from} to ${to}`);
+    openGPay(to, owedAmount, `NeKi-Pocket Settlement - ${from} to ${to}`);
   };
 
   const pending = settlements.filter((s) => s.status === "pending");
@@ -155,7 +155,7 @@ export default function SettlementsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap gap-2 items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Settlements</h1>
           <p className="text-muted-foreground">
@@ -164,7 +164,7 @@ export default function SettlementsPage() {
         </div>
 
         <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-          <DialogTrigger asChild>
+          <DialogTrigger asChild className="ml-auto">
             <Button className="gap-2">
               <Plus className="h-4 w-4" />
               Create Settlement
@@ -253,7 +253,7 @@ export default function SettlementsPage() {
 
       {/* Quick Settle with Google Pay */}
       {balance && balance.owedAmount > 0 && (
-        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
+        <Card className="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-400" />

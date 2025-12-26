@@ -69,8 +69,8 @@ export default function ExpensesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex items-center flex-wrap gap-2 justify-between">
+        <div className="">
           <h1 className="text-3xl font-bold tracking-tight">All Expenses</h1>
           <p className="text-muted-foreground">
             Manage all your shared expenses
@@ -84,7 +84,7 @@ export default function ExpensesPage() {
               value={filterPerson}
               onValueChange={setFilterPerson}
               placeholder="Filter: All "
-              className="w-[140px]"
+              className="w-35"
             />
             {filterPerson && (
               <Button
