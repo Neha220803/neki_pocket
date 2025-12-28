@@ -10,23 +10,21 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MoneyDisplay } from "@/components/shared/MoneyDisplay";
 import { formatDate } from "@/lib/utils";
+import { DeleteExpenseDialog } from "@/components/expenses/DeleteExpenseDialog";
+
 import { Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function ExpenseCard({ expense, onDelete, showDelete = true, className }) {
-  const [isDeleting, setIsDeleting] = React.useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
 
-  const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this expense?")) return;
-
-    setIsDeleting(true);
+  const handleDeleteConfirmed = async (expenseId) => {
     try {
-      await onDelete?.(expense.id);
+      await onDelete?.(expenseId);
+      setShowDeleteDialog(false);
     } catch (error) {
       console.error("Delete error:", error);
-      alert("Failed to delete expense");
-    } finally {
-      setIsDeleting(false);
+      throw error;
     }
   };
 
@@ -37,31 +35,34 @@ function ExpenseCard({ expense, onDelete, showDelete = true, className }) {
       : "bg-primary/5 border-primary/20";
 
   return (
-    <Card className={cn(bgColor, "transition-all hover:shadow-md", className)}>
-      <CardContent className="">
-        {/* Mobile Layout (< 640px) - Stacked */}
-        <div className="flex sm:hidden flex-col gap-2">
-          <div className="flex justify-between">
-            {/* Top Row: Person & Time */}
-            <div className="flex items-center justify-between">
-              <div className="flex flex-col items-start gap-2">
-                <span
-                  className={cn(
-                    "text-xs font-medium px-2 py-0.5 rounded-full",
-                    expense.paidBy === "Kiruthika"
-                      ? "bg-secondary/20 text-secondary-foreground"
-                      : "bg-primary/20 text-primary"
-                  )}
-                >
-                  {expense.paidBy}
-                </span>
-                {/* Middle Row: Reason */}
-                <div className="font-medium text-sm line-clamp-2">
-                  {expense.reason}
+    <>
+      <Card
+        className={cn(bgColor, "transition-all hover:shadow-md", className)}
+      >
+        <CardContent className="">
+          {/* Mobile Layout (< 640px) - Stacked */}
+          <div className="flex sm:hidden flex-col gap-2">
+            <div className="flex justify-between">
+              {/* Top Row: Person & Time */}
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col items-start gap-2">
+                  <span
+                    className={cn(
+                      "text-xs font-medium px-2 py-0.5 rounded-full",
+                      expense.paidBy === "Kiruthika"
+                        ? "bg-secondary/20 text-secondary-foreground"
+                        : "bg-primary/20 text-primary"
+                    )}
+                  >
+                    {expense.paidBy}
+                  </span>
+                  {/* Middle Row: Reason */}
+                  <div className="font-medium text-sm line-clamp-2">
+                    {expense.reason}
+                  </div>
                 </div>
-              </div>
 
-              {/* {showDelete && (
+                {/* {showDelete && (
                 <Button
                   variant="ghost"
                   size="icon-sm"
@@ -72,24 +73,24 @@ function ExpenseCard({ expense, onDelete, showDelete = true, className }) {
                   <Trash2 className="h-4 w-4" />
                 </Button>
               )} */}
+              </div>
+
+              <div className="flex flex-col justify-end">
+                <MoneyDisplay
+                  amount={expense.amount}
+                  size="lg"
+                  variant={
+                    expense.paidBy === "Kiruthika" ? "secondary" : "primary"
+                  }
+                  className="font-semibold"
+                />
+                <span className="text-xs text-muted-foreground">
+                  {formatDate(expense.createdAt, "relative")}
+                </span>
+              </div>
             </div>
 
-            <div className="flex flex-col justify-end">
-              <MoneyDisplay
-                amount={expense.amount}
-                size="lg"
-                variant={
-                  expense.paidBy === "Kiruthika" ? "secondary" : "primary"
-                }
-                className="font-semibold"
-              />
-              <span className="text-xs text-muted-foreground">
-                {formatDate(expense.createdAt, "relative")}
-              </span>
-            </div>
-          </div>
-
-          {/* Bottom Row: Amount
+            {/* Bottom Row: Amount
           <div className="flex justify-end">
             <MoneyDisplay
               amount={expense.amount}
@@ -98,76 +99,86 @@ function ExpenseCard({ expense, onDelete, showDelete = true, className }) {
               className="font-semibold"
             />
           </div> */}
-        </div>
+          </div>
 
-        {/* Desktop/Tablet Layout (>= 640px) - Horizontal */}
-        <div className="hidden sm:flex items-start justify-between gap-4">
-          {/* Left side - Details */}
-          <div className="flex-1 space-y-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span
-                className={cn(
-                  "text-xs font-medium px-2 py-0.5 rounded-full",
-                  expense.paidBy === "Kiruthika"
-                    ? "bg-secondary/20 text-secondary-foreground"
-                    : "bg-primary/20 text-primary"
+          {/* Desktop/Tablet Layout (>= 640px) - Horizontal */}
+          <div className="hidden sm:flex items-start justify-between gap-4">
+            {/* Left side - Details */}
+            <div className="flex-1 space-y-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span
+                  className={cn(
+                    "text-xs font-medium px-2 py-0.5 rounded-full",
+                    expense.paidBy === "Kiruthika"
+                      ? "bg-secondary/20 text-secondary-foreground"
+                      : "bg-primary/20 text-primary"
+                  )}
+                >
+                  {expense.paidBy}
+                </span>
+                {/* Show "paid for" if not "Both" or if explicitly set */}
+                {expense.paidFor && expense.paidFor !== "Both" && (
+                  <>
+                    <span className="text-xs text-muted-foreground">→</span>
+                    <span
+                      className={cn(
+                        "text-xs font-medium px-2 py-0.5 rounded-full border",
+                        expense.paidFor === "Kiruthika"
+                          ? "border-secondary/40 text-secondary-foreground"
+                          : "border-primary/40 text-primary"
+                      )}
+                    >
+                      for {expense.paidFor}
+                    </span>
+                  </>
                 )}
-              >
-                {expense.paidBy}
-              </span>
-              {/* Show "paid for" if not "Both" or if explicitly set */}
-              {expense.paidFor && expense.paidFor !== "Both" && (
-                <>
-                  <span className="text-xs text-muted-foreground">→</span>
-                  <span
-                    className={cn(
-                      "text-xs font-medium px-2 py-0.5 rounded-full border",
-                      expense.paidFor === "Kiruthika"
-                        ? "border-secondary/40 text-secondary-foreground"
-                        : "border-primary/40 text-primary"
-                    )}
-                  >
-                    for {expense.paidFor}
-                  </span>
-                </>
-              )}
 
-              <span className="text-xs text-muted-foreground">
-                {formatDate(expense.createdAt, "relative")}
-              </span>
+                <span className="text-xs text-muted-foreground">
+                  {formatDate(expense.createdAt, "relative")}
+                </span>
+              </div>
+
+              <div className="font-medium text-sm">{expense.reason}</div>
+              {(!expense.paidFor || expense.paidFor === "Both") && (
+                <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-full border border-muted">
+                  for Both
+                </span>
+              )}
             </div>
 
-            <div className="font-medium text-sm">{expense.reason}</div>
-            {(!expense.paidFor || expense.paidFor === "Both") && (
-              <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-full border border-muted">
-                for Both
-              </span>
-            )}
+            {/* Right side - Amount and Actions */}
+            <div className="flex flex-col items-end justify-between gap-3 shrink-0">
+              {showDelete && (
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => setShowDeleteDialog(true)}
+                  className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+              <MoneyDisplay
+                amount={expense.amount}
+                size="lg"
+                variant={
+                  expense.paidBy === "Kiruthika" ? "secondary" : "primary"
+                }
+                className="font-semibold"
+              />
+            </div>
           </div>
+        </CardContent>
+      </Card>
 
-          {/* Right side - Amount and Actions */}
-          <div className="flex flex-col items-end justify-between gap-3 shrink-0">
-            {showDelete && (
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            )}
-            <MoneyDisplay
-              amount={expense.amount}
-              size="lg"
-              variant={expense.paidBy === "Kiruthika" ? "secondary" : "primary"}
-              className="font-semibold"
-            />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+      {/* Delete Confirmation Dialog */}
+      <DeleteExpenseDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        expense={expense}
+        onConfirmed={handleDeleteConfirmed}
+      />
+    </>
   );
 }
 

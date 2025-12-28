@@ -76,7 +76,7 @@ export default function ExpensesPage() {
             Manage all your shared expenses
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex justify-between items-center gap-2">
           {/* Filter by Person */}
           <div className="flex items-center gap-2">
             <PersonSelect
