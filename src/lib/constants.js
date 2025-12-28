@@ -44,7 +44,7 @@ export const SETTLEMENT_STATUS = {
 
 // Google Pay Configuration
 export const GPAY_CONFIG = {
-  KIRUTHIKA_UPI: "palanivelraj@oksbi",
+  KIRUTHIKA_UPI: "kiruthikapalanivelraj@oksbi",
   NEHA_UPI: "neeharika.srinivasan@oksbi",
 };
 
