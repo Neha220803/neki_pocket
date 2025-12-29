@@ -36,6 +36,8 @@ import { Plus, Loader2 } from "lucide-react";
 import { CURRENCY } from "@/lib/constants";
 
 function AddExpenseDialog({ onExpenseAdded, trigger }) {
+  const amountInputRef = React.useRef(null);
+  const reasonInputRef = React.useRef(null);
   const [open, setOpen] = React.useState(false);
   const [paidBy, setPaidBy] = React.useState("");
   const [paidFor, setPaidFor] = React.useState("Both");
@@ -47,7 +49,7 @@ function AddExpenseDialog({ onExpenseAdded, trigger }) {
 
   // Reset form when dialog opens/closes
   React.useEffect(() => {
-    if (open) {
+    if (!open) {
       setPaidBy("");
       setPaidFor("Both");
       setAmount("");
@@ -149,6 +151,7 @@ function AddExpenseDialog({ onExpenseAdded, trigger }) {
             {CURRENCY.SYMBOL}
           </span>
           <Input
+            ref={amountInputRef}
             id="amount"
             type="tel"
             inputMode="decimal"
@@ -156,10 +159,11 @@ function AddExpenseDialog({ onExpenseAdded, trigger }) {
             placeholder="300"
             value={amount}
             onChange={(e) => {
-              // Allow only numbers and one decimal point
               const value = e.target.value;
               if (value === "" || /^\d*\.?\d{0,2}$/.test(value)) {
                 setAmount(value);
+                // Maintain focus after state update
+                setTimeout(() => amountInputRef.current?.focus(), 0);
               }
             }}
             className="pl-8"
@@ -169,8 +173,12 @@ function AddExpenseDialog({ onExpenseAdded, trigger }) {
 
       {/* Reason */}
       <ReasonInput
+        ref={reasonInputRef}
         value={reason}
-        onChange={setReason}
+        onChange={(newValue) => {
+          setReason(newValue);
+          setTimeout(() => reasonInputRef.current?.focus(), 0);
+        }}
         label="Reason"
         placeholder="e.g., Dinner at Sangeetha"
         required

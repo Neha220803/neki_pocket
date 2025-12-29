@@ -29,7 +29,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Loader2, Sparkles } from "lucide-react";
+import { Plus, Sparkles } from "lucide-react";
 import { openGPay } from "@/lib/gpay";
 import { CURRENCY } from "@/lib/constants";
 
@@ -208,12 +208,17 @@ export default function SettlementsPage() {
                     {CURRENCY.SYMBOL}
                   </span>
                   <Input
-                    type="number"
-                    step="0.01"
-                    min="0"
+                    type="tel"
+                    inputMode="decimal"
+                    pattern="[0-9]*\.?[0-9]*"
                     placeholder="750"
                     value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === "" || /^\d*\.?\d{0,2}$/.test(value)) {
+                        setAmount(value);
+                      }
+                    }}
                     className="pl-8"
                   />
                 </div>
@@ -265,7 +270,7 @@ export default function SettlementsPage() {
 
       {/* Quick Settle with Google Pay */}
       {balance && balance.owedAmount > 0 && (
-        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
+        <Card className="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-400" />

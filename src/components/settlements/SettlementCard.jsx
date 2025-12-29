@@ -78,7 +78,6 @@ function SettlementCard({ settlement, className }) {
                 : settlement.paymentMethod === "cash"
                 ? "Cash"
                 : settlement.paymentMethod}{" "}
-              ✓
             </div>
           )}
         </div>
