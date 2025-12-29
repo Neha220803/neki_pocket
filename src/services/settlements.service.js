@@ -9,7 +9,7 @@ import { COLLECTIONS, SETTLEMENT_STATUS, PEOPLE } from "@/lib/constants";
 import { validateSettlement } from "@/lib/validators";
 
 /**
- * Create a new settlement (pending confirmation)
+ * Create a new settlement (immediately confirmed)
  * @param {Object} settlementData - { from, to, amount, paymentMethod }
  * @returns {Promise<Object>} Created settlement with ID
  */
@@ -24,12 +24,10 @@ export async function createSettlement(settlementData) {
     from: settlementData.from,
     to: settlementData.to,
     amount: Number(settlementData.amount),
-    status: SETTLEMENT_STATUS.PENDING,
-    confirmedByFrom: false,
-    confirmedByTo: false,
+    status: SETTLEMENT_STATUS.CONFIRMED, // Immediately confirmed
     paymentMethod: settlementData.paymentMethod || null,
     createdAt: Timestamp.now(),
-    confirmedAt: null,
+    confirmedAt: Timestamp.now(), // Set immediately
   };
 
   try {
@@ -54,11 +52,6 @@ export async function createSettlement(settlementData) {
 export async function getAllSettlements(options = {}) {
   try {
     let q = adminDb.collection(COLLECTIONS.SETTLEMENTS);
-
-    // Filter by status if specified
-    if (options.status) {
-      q = q.where("status", "==", options.status);
-    }
 
     // Order by creation date (newest first by default)
     const sortOrder = options.orderBy || "desc";
@@ -94,7 +87,7 @@ export async function getPendingSettlements() {
  * @returns {Promise<Array>} Confirmed settlements
  */
 export async function getConfirmedSettlements() {
-  return getAllSettlements({ status: SETTLEMENT_STATUS.CONFIRMED });
+  return getAllSettlements();
 }
 
 /**
@@ -205,11 +198,6 @@ export async function deleteSettlement(settlementId) {
     // Get the settlement
     const settlement = await getSettlementById(settlementId);
 
-    // Don't allow deleting confirmed settlements
-    if (settlement.status === SETTLEMENT_STATUS.CONFIRMED) {
-      throw new Error("Cannot delete confirmed settlements");
-    }
-
     // Delete the settlement
     await adminDb
       .collection(COLLECTIONS.SETTLEMENTS)
@@ -234,18 +222,12 @@ export async function deleteSettlement(settlementId) {
 export async function getSettlementStats() {
   try {
     const allSettlements = await getAllSettlements();
-    const confirmed = allSettlements.filter(
-      (s) => s.status === SETTLEMENT_STATUS.CONFIRMED
-    );
-    const pending = allSettlements.filter(
-      (s) => s.status === SETTLEMENT_STATUS.PENDING
-    );
 
     let totalSettled = 0;
     let kiruthikaPaidNeha = 0;
     let nehaPaidKiruthika = 0;
 
-    confirmed.forEach((settlement) => {
+    allSettlements.forEach((settlement) => {
       const amount = Number(settlement.amount);
       totalSettled += amount;
 
@@ -260,8 +242,6 @@ export async function getSettlementStats() {
       totalSettled: Math.round(totalSettled * 100) / 100,
       kiruthikaPaidNeha: Math.round(kiruthikaPaidNeha * 100) / 100,
       nehaPaidKiruthika: Math.round(nehaPaidKiruthika * 100) / 100,
-      confirmedCount: confirmed.length,
-      pendingCount: pending.length,
       totalCount: allSettlements.length,
     };
   } catch (error) {

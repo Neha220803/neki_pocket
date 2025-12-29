@@ -1,31 +1,29 @@
 // ============================================
-// API ROUTE: Settlements
+// API ROUTE: Settlements - SIMPLIFIED
 // GET /api/settlements - Get all settlements
-// POST /api/settlements - Create new settlement
+// POST /api/settlements - Create new settlement (with PIN verification)
 // ============================================
 
 import { NextResponse } from "next/server";
+import { verifyPIN } from "@/lib/validators";
+import { serializeDocs, serializeDoc } from "@/lib/firestore-helpers";
 import {
-  getAllSettlements,
   createSettlement,
-  getPendingSettlements,
-  getConfirmedSettlements,
-  getSettlementStats,
+  getAllSettlements,
   getRecentSettlements,
   getSettlementsByPerson,
+  getSettlementStats,
 } from "@/services/settlements.service";
-import { serializeDocs, serializeDoc } from "@/lib/firestore-helpers";
 
 /**
  * GET all settlements with optional filters
- * Query params: ?status=pending&limit=10&person=Kiruthika&stats=true
+ * Query params: ?limit=10&person=Kiruthika&stats=true
  */
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
 
     // Parse query parameters
-    const status = searchParams.get("status");
     const limit = searchParams.get("limit");
     const person = searchParams.get("person");
     const recent = searchParams.get("recent");
@@ -63,43 +61,15 @@ export async function GET(request) {
       });
     }
 
-    // If filtered by status
-    if (status === "pending") {
-      const settlements = await getPendingSettlements();
-      return NextResponse.json({
-        success: true,
-        settlements: serializeDocs(settlements),
-        count: settlements.length,
-        status: "pending",
-      });
-    }
-
-    if (status === "confirmed") {
-      const settlements = await getConfirmedSettlements();
-      return NextResponse.json({
-        success: true,
-        settlements: serializeDocs(settlements),
-        count: settlements.length,
-        status: "confirmed",
-      });
-    }
-
     // Default: Get all settlements
     const options = {};
     if (limit) options.limit = parseInt(limit);
-    if (status) options.status = status;
 
     const settlements = await getAllSettlements(options);
-
-    // Separate into pending and confirmed
-    const pending = settlements.filter((s) => s.status === "pending");
-    const confirmed = settlements.filter((s) => s.status === "confirmed");
 
     return NextResponse.json({
       success: true,
       settlements: serializeDocs(settlements),
-      pending: serializeDocs(pending),
-      confirmed: serializeDocs(confirmed),
       count: settlements.length,
     });
   } catch (error) {
@@ -115,13 +85,13 @@ export async function GET(request) {
 }
 
 /**
- * POST - Create new settlement
- * Body: { from, to, amount, paymentMethod }
+ * POST - Create new settlement (with PIN verification)
+ * Body: { from, to, amount, paymentMethod, pin }
  */
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { from, to, amount, paymentMethod } = body;
+    const { from, to, amount, paymentMethod, pin } = body;
 
     // Validate required fields
     if (!from || !to || !amount) {
@@ -131,7 +101,26 @@ export async function POST(request) {
       );
     }
 
-    // Create settlement
+    // Validate PIN
+    if (!pin) {
+      return NextResponse.json(
+        { error: "PIN is required to create settlement" },
+        { status: 400 }
+      );
+    }
+
+    const pinVerification = verifyPIN(pin);
+    if (!pinVerification.isValid) {
+      return NextResponse.json(
+        {
+          error: "Invalid PIN",
+          details: pinVerification.errors[0],
+        },
+        { status: 401 }
+      );
+    }
+
+    // Create settlement (immediately confirmed)
     const settlement = await createSettlement({
       from,
       to,
@@ -142,7 +131,7 @@ export async function POST(request) {
     return NextResponse.json(
       {
         success: true,
-        message: "Settlement created successfully",
+        message: "Settlement created and confirmed successfully! 🎉",
         settlement: serializeDoc(settlement),
       },
       { status: 201 }

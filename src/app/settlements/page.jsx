@@ -1,18 +1,25 @@
 "use client";
 
 // ============================================
-// SETTLEMENTS PAGE
-// View and manage settlements with Google Pay integration
+// SETTLEMENTS PAGE - SIMPLIFIED
+// Single confirmation flow
 // ============================================
 
 import * as React from "react";
 import { SettlementList } from "@/components/settlements/SettlementList";
-import { ConfirmSettlementDialog } from "@/components/settlements/ConfirmSettlementDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PersonSelect } from "@/components/shared/PersonSelect";
+import { PinVerification } from "@/components/shared/PinVerification";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -30,19 +37,16 @@ export default function SettlementsPage() {
   const [settlements, setSettlements] = React.useState([]);
   const [balance, setBalance] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
-  const [selectedSettlement, setSelectedSettlement] = React.useState(null);
-  const [showConfirmDialog, setShowConfirmDialog] = React.useState(false);
   const [showCreateDialog, setShowCreateDialog] = React.useState(false);
+  const [showPinDialog, setShowPinDialog] = React.useState(false);
 
   // Create settlement form state
   const [from, setFrom] = React.useState("");
   const [to, setTo] = React.useState("");
   const [amount, setAmount] = React.useState("");
+  const [paymentMethod, setPaymentMethod] = React.useState("");
   const [isCreating, setIsCreating] = React.useState(false);
   const [createError, setCreateError] = React.useState("");
-
-  // Current user (in production, get from auth context)
-  const [currentUser, setCurrentUser] = React.useState("Kiruthika");
 
   const fetchData = async () => {
     setLoading(true);
@@ -73,26 +77,10 @@ export default function SettlementsPage() {
     fetchData();
   }, []);
 
-  const handleConfirm = (settlementId, user) => {
-    const settlement = settlements.find((s) => s.id === settlementId);
-    setSelectedSettlement(settlement);
-    setCurrentUser(user);
-    setShowConfirmDialog(true);
-  };
-
-  const handleConfirmed = (updatedSettlement, isFullyConfirmed) => {
-    if (isFullyConfirmed) {
-      alert("Settlement fully confirmed by both parties! 🎉");
-    } else {
-      alert("Settlement confirmed. Waiting for other party.");
-    }
-    fetchData();
-  };
-
-  const handleCreateSettlement = async () => {
+  const handleProceedToPin = () => {
     setCreateError("");
 
-    if (!from || !to || !amount) {
+    if (!from || !to || !amount || !paymentMethod) {
       setCreateError("Please fill in all fields");
       return;
     }
@@ -103,7 +91,13 @@ export default function SettlementsPage() {
       return;
     }
 
+    // Show PIN dialog
+    setShowPinDialog(true);
+  };
+
+  const handlePinVerified = async (pin) => {
     setIsCreating(true);
+    setCreateError("");
 
     try {
       const response = await fetch("/api/settlements", {
@@ -112,25 +106,32 @@ export default function SettlementsPage() {
         body: JSON.stringify({
           from,
           to,
-          amount: numAmount,
+          amount: parseFloat(amount),
+          paymentMethod,
+          pin,
         }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
+        // Success - close dialogs and reset form
+        setShowPinDialog(false);
         setShowCreateDialog(false);
         setFrom("");
         setTo("");
         setAmount("");
+        setPaymentMethod("");
         fetchData();
-        alert("Settlement created successfully!");
+        alert("Settlement created successfully! 🎉");
       } else {
         setCreateError(data.error || "Failed to create settlement");
+        setShowPinDialog(false);
       }
     } catch (error) {
       console.error("Error creating settlement:", error);
       setCreateError("Failed to create settlement. Please try again.");
+      setShowPinDialog(false);
     } finally {
       setIsCreating(false);
     }
@@ -149,9 +150,6 @@ export default function SettlementsPage() {
     openGPay(to, owedAmount, `NeKi-Pocket Settlement - ${from} to ${to}`);
   };
 
-  const pending = settlements.filter((s) => s.status === "pending");
-  const confirmed = settlements.filter((s) => s.status === "confirmed");
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -159,7 +157,7 @@ export default function SettlementsPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Settlements</h1>
           <p className="text-muted-foreground">
-            Manage and confirm your settlements
+            Record your payment settlements
           </p>
         </div>
 
@@ -174,14 +172,14 @@ export default function SettlementsPage() {
             <DialogHeader>
               <DialogTitle>Create Settlement</DialogTitle>
               <DialogDescription>
-                Record a new settlement between you and your partner
+                Record a payment you made or received
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>
-                  From <span className="text-destructive">*</span>
+                  From (Payer) <span className="text-destructive">*</span>
                 </Label>
                 <PersonSelect
                   value={from}
@@ -192,7 +190,7 @@ export default function SettlementsPage() {
 
               <div className="space-y-2">
                 <Label>
-                  To <span className="text-destructive">*</span>
+                  To (Receiver) <span className="text-destructive">*</span>
                 </Label>
                 <PersonSelect
                   value={to}
@@ -221,6 +219,22 @@ export default function SettlementsPage() {
                 </div>
               </div>
 
+              <div className="space-y-2">
+                <Label>
+                  Payment Method <span className="text-destructive">*</span>
+                </Label>
+                <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select payment method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="gpay">Google Pay</SelectItem>
+                    <SelectItem value="cash">Cash</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               {createError && (
                 <div className="text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md p-3">
                   {createError}
@@ -236,15 +250,13 @@ export default function SettlementsPage() {
               >
                 Cancel
               </Button>
-              <Button onClick={handleCreateSettlement} disabled={isCreating}>
-                {isCreating ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Creating...
-                  </>
-                ) : (
-                  "Create Settlement"
-                )}
+              <Button
+                onClick={handleProceedToPin}
+                disabled={
+                  isCreating || !from || !to || !amount || !paymentMethod
+                }
+              >
+                Proceed to PIN
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -253,7 +265,7 @@ export default function SettlementsPage() {
 
       {/* Quick Settle with Google Pay */}
       {balance && balance.owedAmount > 0 && (
-        <Card className="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
+        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -278,22 +290,20 @@ export default function SettlementsPage() {
 
       {/* Settlements List */}
       <SettlementList
-        pending={pending}
-        confirmed={confirmed}
+        settlements={settlements}
         loading={loading}
-        onConfirm={handleConfirm}
-        currentUser={currentUser}
-        separateSections={true}
+        separateSections={false}
         emptyMessage="No settlements yet. Create your first settlement!"
       />
 
-      {/* Confirm Settlement Dialog */}
-      <ConfirmSettlementDialog
-        open={showConfirmDialog}
-        onOpenChange={setShowConfirmDialog}
-        settlement={selectedSettlement}
-        currentUser={currentUser}
-        onConfirmed={handleConfirmed}
+      {/* PIN Verification Dialog */}
+      <PinVerification
+        open={showPinDialog}
+        onOpenChange={setShowPinDialog}
+        onVerified={handlePinVerified}
+        title="Verify PIN to Create Settlement"
+        description={`Enter your PIN to confirm the settlement of ₹${amount} from ${from} to ${to}`}
+        verifyingText="Creating settlement..."
       />
     </div>
   );
