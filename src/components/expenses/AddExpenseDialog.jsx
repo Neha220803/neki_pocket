@@ -150,12 +150,18 @@ function AddExpenseDialog({ onExpenseAdded, trigger }) {
           </span>
           <Input
             id="amount"
-            type="number"
-            step="0.01"
-            min="0"
+            type="tel"
+            inputMode="decimal"
+            pattern="[0-9]*\.?[0-9]*"
             placeholder="300"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e) => {
+              // Allow only numbers and one decimal point
+              const value = e.target.value;
+              if (value === "" || /^\d*\.?\d{0,2}$/.test(value)) {
+                setAmount(value);
+              }
+            }}
             className="pl-8"
           />
         </div>
